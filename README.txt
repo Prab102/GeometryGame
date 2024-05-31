@@ -1,0 +1,1 @@
+to compile type make in terminal and then make run to run it
