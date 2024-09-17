@@ -35,6 +35,7 @@ void Game::run(){
         sEnemySpawner();
         sMovement();
         sCollision();
+        sLifespan();
         sUserInput();
         sRender();
 
@@ -159,7 +160,7 @@ void Game::sUserInput(){
             if(event.mouseButton.button == sf::Mouse::Left){
 
             
-                std::cout << " left mouse button pressed at (" << event.mouseButton.x << "," << event.mouseButton.y <<")";
+                // std::cout << " left mouse button pressed at (" << event.mouseButton.x << "," << event.mouseButton.y <<")";
                 //spawn the bullet going in the proper directions
                 Vec2 mousePos(event.mouseButton.x,event.mouseButton.y);
                 spawnBullet(m_player,mousePos);
@@ -174,6 +175,14 @@ void Game::sUserInput(){
     }
 }
 void Game::sLifespan(){
+    // m_bulletspawntime = m_currentFrame;
+        // std::cout << "comes here";
+        for(auto b: m_entities.getEntities("bullet")){
+            // std::cout << b->cLifespan->total << "this is total";
+            if(b->cLifespan->total == m_currentFrame){
+                b->destroy();
+            }
+        }
 
 }
 void Game::sRender(){
@@ -211,8 +220,8 @@ void Game::sCollision(){
             float dist = (D.x*D.x + D.y*D.y);
 
             if(dist < ((r1+r2)*(r1+r2))){
-                std::cout << "there was a collision";
-                std::cout << e->cShape->circle.getPointCount();
+                // std::cout << "there was a collision";
+                // std::cout << e->cShape->circle.getPointCount();
                 spawnSmallEnemies(e);
                 //remove big enemy 
                 e->destroy();
@@ -233,8 +242,8 @@ void Game::sCollision(){
             float dist = (D.x*D.x + D.y*D.y);
 
             if(dist < ((r1+r2)*(r1+r2))){
-                std::cout << "there was a collision";
-                std::cout << e->cShape->circle.getPointCount();
+                // std::cout << "there was a collision";
+                // std::cout << e->cShape->circle.getPointCount();
                 spawnSmallEnemies(e);
                 //remove big enemy 
                 m_player->cTransform->pos.x =m_window.getSize().x/2;
@@ -273,8 +282,9 @@ void Game::spawnEnemy(){
     if(ey > 670){
         ey = 670;
     }
-
+    //params position velocity angle
     entity->cTransform = std::make_shared<CTransform>(Vec2(ex,ey),Vec2(1.0f,1.0f),2.0f);
+    //params radius points incolor outcolor thickness
     entity->cShape = std::make_shared<CShape>(30.0f,3,sf::Color(0,0,255),sf::Color(255,255,255),4.0f);
     // entity->cInput = std::make_shared<CInput>();
     // m_player = entity;
@@ -312,6 +322,10 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 & mousePos){
 
     bullet->cTransform = std::make_shared<CTransform>(Vec2(entity->cTransform->pos.x, entity->cTransform->pos.y),Vec2(velocity.x,velocity.y),2.0f);
     bullet->cShape = std::make_shared<CShape>(3.0f,16,sf::Color(255,255,255),sf::Color(255,255,255),2.0f);
+    bullet->cLifespan = std::make_shared<CLifespan>(m_currentFrame + 80); //total remaining starts from 0
+    // std::cout << "makesit here";
+    // m_bulletspawntime = m_currentFrame;
+
 
     //D= (mx-px, my-py)
     //L = sqrt(x*x + y*y)
